@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>pigeonhole.c</title>
+</head>
+
+<body>
+
+<h2>pigeonhole.c</h2>
+
+<p>A small C program to create DIMACS CNF files that encode the pigeonhole
+problem (i.e. placing n+1 pigeons into n holes).</p>
+
+<p>The SAT encoding of this problem is very straightforward.  For each pigeon i
+and each hole j we have a variable x_{n*(i-1)+j} which means that pigeon i
+is placed in hole j.  Then we have n+1 clauses which say that a pigeon has
+to be placed in some hole.  Then for each hole we have a set of clauses
+ensuring that only one single pigeon is placed into that hole.</p>
+
+<P>This encoding leads to a total of (n+1) * n propositional variables and
+(n+1) + n * (n * (n+1) / 2) clauses.</p>
+
+<p>The resulting SAT problem is unsatisfiable.</p>
+
+<h3>Download</h3>
+
+<ul>
+  <li><a href="pigeonhole.c">pigeonhole.c</a></li>
+  <li><a href="Makefile">Makefile</a></li>
+</ul>
+
+<h3>Some Generated Pigeonhole Instances</h3>
+
+<ul>
+  <li><a href="pigeon-1.cnf">pigeon-1.cnf</a></li>
+  <li><a href="pigeon-2.cnf">pigeon-2.cnf</a></li>
+  <li><a href="pigeon-3.cnf">pigeon-3.cnf</a></li>
+  <li><a href="pigeon-4.cnf">pigeon-4.cnf</a></li>
+  <li><a href="pigeon-5.cnf">pigeon-5.cnf</a></li>
+  <li><a href="pigeon-6.cnf">pigeon-6.cnf</a></li>
+  <li><a href="pigeon-7.cnf">pigeon-7.cnf</a></li>
+  <li><a href="pigeon-8.cnf">pigeon-8.cnf</a></li>
+  <li><a href="pigeon-9.cnf">pigeon-9.cnf</a></li>
+  <li><a href="pigeon-10.cnf">pigeon-10.cnf</a></li>
+  <li><a href="pigeon-11.cnf">pigeon-11.cnf</a></li>
+  <li><a href="pigeon-12.cnf">pigeon-12.cnf</a></li>
+  <li><a href="pigeon-13.cnf">pigeon-13.cnf</a></li>
+  <li><a href="pigeon-14.cnf">pigeon-14.cnf</a></li>
+  <li><a href="pigeon-15.cnf">pigeon-15.cnf</a></li>
+  <li><a href="pigeon-16.cnf">pigeon-16.cnf</a></li>
+  <li><a href="pigeon-17.cnf">pigeon-17.cnf</a></li>
+  <li><a href="pigeon-18.cnf">pigeon-18.cnf</a></li>
+  <li><a href="pigeon-19.cnf">pigeon-19.cnf</a></li>
+  <li><a href="pigeon-20.cnf">pigeon-20.cnf</a></li>
+</ul>
+
+<hr>
+
+<small>Last modified: 2007-11-22</small>
+
+</body>
+
+</html>

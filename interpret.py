@@ -1,5 +1,5 @@
 from util import Variable, Literal, Clause
-import re
+import re,logging
 
 class Parser:
     #takes a string of clauses separated by newlines
@@ -30,7 +30,9 @@ class Parser:
                     l = Literal(var,not bool(m.group(1)))
                     c.append(l)
                 else:
-                    clauses.append(Clause(*c))
+                    addition = Clause(*c)
+                    addition.link()
+                    clauses.append(addition)
                     c = []
         if checksum:
             assert(len(self.known)==int(checksum[0]))
@@ -42,12 +44,14 @@ if __name__=="__main__":
     from solver import Solver
     if len(sys.argv)<2:
         exit(1)
+    #logging.basicConfig(filename=sys.argv[1]+".log",level=logging.DEBUG)
+    #logging.basicConfig(level=logging.DEBUG)
     p = Parser(sys.argv[1])
     s = Solver(p)
     print "Solving..."
     r = s.CDCL()
     if r=="SAT":
         print r
-        s.printVars()
+        print s.Model()
     else:
         print "UNSAT"

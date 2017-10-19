@@ -108,6 +108,10 @@ class TestClause(unittest.TestCase):
         c = Clause(self.l3, self.l1, self.l1)
         self.l3.occurrence_link(c)
         self.assertEqual(c.status(),"UNRESOLVED")
+        c = Clause(self.l3,self.l1,self.l2)
+        c.link()
+        self.assertEqual(c.status(),"SAT")
+
     def test_resolution(self):
         c1 = Clause(self.l1,self.l2)
         c2 = Clause(self.l1,self.l3)

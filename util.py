@@ -1,3 +1,5 @@
+import logging
+
 class Assignment:
     #each value in the assignment stack is a struct:
     #1) the decision level: Int
@@ -20,6 +22,7 @@ class Variable:
         self.stk_ptr = None
         self.name = name
         self.count = 0
+        self.waiting = False
         #there is an occurance list for each polarity
         self.occurrence={True:OccurrenceList(),False:OccurrenceList()}
     def __repr__(self):
@@ -71,13 +74,26 @@ class Clause:
     #2) two watch pointers
     #for watch pointers to work, there must be at least two literals
     def __init__(self,*literals):
-        self.literals = literals
+        self.literals = [(l,l.variable.stk_ptr.dl if l.variable.stk_ptr else -1) for l in literals]
+        self.literals.sort(key=lambda x: x[1],reverse=True)
+        self.literals = [x[0] for x in self.literals]
         self.s = set(literals)
         if len(literals)>1:
             self.refA = 0 #literals[0]
             self.refB = 1 #literals[1]
+    def link(self):
+        if len(self.literals)>1:
+            self.literals[self.refA].occurrence_link(self)
+            self.literals[self.refB].occurrence_link(self)
     def __repr__(self):
-        return str(self.literals)
+        if len(self.literals)>1:
+            s = []
+            for i,l in enumerate(self.literals):
+                t = "*" if i==self.refA or i==self.refB else ""
+                s.append(t+str(l))
+            return "[{}]".format(', '.join(s))
+        else:
+            return str(self.literals) 
     def __len__(self):
         return len(self.literals)
     def __eq__(self,x):
@@ -88,7 +104,7 @@ class Clause:
     def __contains__(self,x):
         return x in self.s
     def __iter__(self):
-        return self.literals
+        return iter(self.literals)
     def status(self):
         #this function determines if the clause is:
         #1) UNSAT
@@ -121,7 +137,7 @@ class Clause:
             # in order to conclude unit
             known,other = (self.refA,self.refB) if vA==None else (self.refB, self.refA)
             for i in range(len(self.literals)):
-                if i!=known and self.literals[i].value()==None:
+                if (i!=known and self.literals[i].value()==None) or (self.literals[i].value()):
                     if known==self.refA:
                         self.refB = i
                     else:
@@ -130,7 +146,9 @@ class Clause:
                     lit_to_remove = self.literals[other]
                     lit_to_add = self.literals[i]
                     lit_to_remove.occurrence_unlink(self)
-                    lit_to_add.occurrence_link(self)           
+                    lit_to_add.occurrence_link(self)
+                    if self.literals[i].value():
+                        return "SAT"
                     break
             else:
                 #no other literals were unassigned
@@ -143,14 +161,17 @@ class Clause:
         # and resolves them into a single clause
         #resolution only works on two clauses
         assert(isinstance(clause2,Clause))
+        logging.debug("Resolving: {} with {}".format(self,clause2))
         l = self.s.union(clause2.s)
         f = filter(lambda x: -x in l, l)
         #a single literal must differ (no more or less)
         assert(len(f)==2)#+/- x
         for x in f:
             l.remove(x)
-        return Clause(*l)
+        r = Clause(*l)
+        logging.debug(" -> {}".format(r))
+        return r
 
 class OccurrenceList(list):
     def unlink(self,idx):
-        return self[:idx]+self[idx+1:]
+        return OccurrenceList(self[:idx]+self[idx+1:])

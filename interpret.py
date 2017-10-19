@@ -15,7 +15,7 @@ class Parser:
         self.known = dict()
         clauses = []
         c = []
-        m = re.match("p (.+) (.+)\s*\n",lines)
+        m = re.match("p (?:cnf )?(.+) (.+)\s*\n",lines)
         checksum = m.groups() if m else None
         
         lines = re.sub("[cp].*?\n","",lines)

@@ -2,4 +2,4 @@
 
 Only accepts CNF
 
-`python interpet.py tests/pigeonhole/pigeon-1.cnf`
+`python interpret.py tests/pigeonhole/pigeon-1.cnf`

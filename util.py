@@ -1,5 +1,3 @@
-import logging
-
 class Assignment:
     #each value in the assignment stack is a struct:
     #1) the decision level: Int
@@ -84,7 +82,7 @@ class Clause:
         for i, l in enumerate(self.literals):
             if l.variable.stk_ptr:
                 dl = l.variable.stk_ptr.dl
-                if dl > first[1]:
+                if dl >= first[1]:
                     second = first
                     first = (i,dl)
                 if dl>m and l.variable.stk_ptr.clause:
@@ -177,7 +175,6 @@ class Clause:
         # and resolves them into a single clause
         #resolution only works on two clauses
         assert(isinstance(clause2,Clause))
-        logging.debug("Resolving: {} with {}".format(self,clause2))
         l = self.s.union(clause2.s)
         f = filter(lambda x: -x in l, l)
         #a single literal must differ (no more or less)
@@ -185,7 +182,6 @@ class Clause:
         for x in f:
             l.remove(x)
         r = Clause(*l)
-        logging.debug(" -> {}".format(r))
         return r
 
 class OccurrenceList(list):

@@ -84,10 +84,7 @@ class Solver:
         dl = assignment.dl
         #first resolve the conflict clause with the conflicting assignment's clause
         new_clause = assignment.clause.resolve(conflict_clause)
-        #only look at assigned literals with an asserting clause
-        literals = filter(lambda x: x.variable.stk_ptr and x.variable.stk_ptr.clause,new_clause)
-        #look at them sorted by decision level (greatest to least)
-        l = max(literals,key=lambda x: x.variable.stk_ptr.dl)
+        l = new_clause.max_lit
         while True:
             new_clause = new_clause.resolve(l.variable.stk_ptr.clause)
             if len(new_clause)==0:
@@ -108,16 +105,8 @@ class Solver:
                 new_clause.link()
                 self.clauses.append(new_clause)
                 #return the second highest decision level
-                first = 0
-                second = 0
-                for x in new_clause:
-                    dl = x.variable.stk_ptr.dl
-                    if dl > first:
-                        second = first
-                        first = dl
-                return second
-            literals = filter(lambda x: x.variable.stk_ptr and x.variable.stk_ptr.clause,new_clause)
-            l = max(literals,key=lambda x: x.variable.stk_ptr.dl)
+                return new_clause.literals[new_clause.refB].variable.stk_ptr.dl
+            l = new_clause.max_lit
     def BackTrack(self):
         #clean up every assignment >= self.dl
         # remove from stack and unassign

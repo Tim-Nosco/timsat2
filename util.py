@@ -79,12 +79,17 @@ class Clause:
         self.literals = literals
         first = (-1,0)
         second = (-1,0)
+        self.max_lit = None
+        m=-1
         for i, l in enumerate(self.literals):
             if l.variable.stk_ptr:
                 dl = l.variable.stk_ptr.dl
                 if dl > first[1]:
                     second = first
                     first = (i,dl)
+                if dl>m and l.variable.stk_ptr.clause:
+                    m = dl
+                    self.max_lit = l
         if len(literals)>1:
             self.refA = first[0] if first[0] != -1 else 0
             self.refB = second[0] if second[0] != -1 else ((self.refA + 1) % len(self.literals))

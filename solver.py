@@ -67,6 +67,9 @@ class Solver:
                         l.variable.waiting = new_assignment
                         logging.info("Learned: {} -> {} = {}".format(clause,l.variable.name,l.polarity))
                     else:
+                        #the variable hasn't been assigned yet because it was determined from a
+                        # unit clause in this same loop
+                        # there could be a conflict, so we must check before continuing
                         l.variable.assign(l.variable.waiting)
                         case = clause.status()
                         if case=="UNSAT":
@@ -105,10 +108,14 @@ class Solver:
                 new_clause.link()
                 self.clauses.append(new_clause)
                 #return the second highest decision level
-                r = [x.variable.stk_ptr.dl for x in new_clause]
-                i = r.index(max(r))
-                r = r[:i]+r[i+1:]
-                return max(r)
+                first = 0
+                second = 0
+                for x in new_clause:
+                    dl = x.variable.stk_ptr.dl
+                    if dl > first:
+                        second = first
+                        first = dl
+                return second
             literals = filter(lambda x: x.variable.stk_ptr and x.variable.stk_ptr.clause,new_clause)
             l = max(literals,key=lambda x: x.variable.stk_ptr.dl)
     def BackTrack(self):

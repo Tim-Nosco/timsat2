@@ -74,19 +74,27 @@ class Clause:
     #2) two watch pointers
     #for watch pointers to work, there must be at least two literals
     def __init__(self,*literals):
-        self.literals = [(l,l.variable.stk_ptr.dl if l.variable.stk_ptr else -1) for l in literals]
-        self.literals.sort(key=lambda x: x[1],reverse=True)
-        self.literals = [x[0] for x in self.literals]
         self.s = set(literals)
+        #setup the watch pointers
+        self.literals = literals
+        first = (-1,0)
+        second = (-1,0)
+        for i, l in enumerate(self.literals):
+            if l.variable.stk_ptr:
+                dl = l.variable.stk_ptr.dl
+                if dl > first[1]:
+                    second = first
+                    first = (i,dl)
         if len(literals)>1:
-            self.refA = 0 #literals[0]
-            self.refB = 1 #literals[1]
+            self.refA = first[0] if first[0] != -1 else 0
+            self.refB = second[0] if second[0] != -1 else ((self.refA + 1) % len(self.literals))
     def link(self):
         if len(self.literals)>1:
             self.literals[self.refA].occurrence_link(self)
             self.literals[self.refB].occurrence_link(self)
     def __repr__(self):
         if len(self.literals)>1:
+            #print stars by the watched literals
             s = []
             for i,l in enumerate(self.literals):
                 t = "*" if i==self.refA or i==self.refB else ""
@@ -111,6 +119,9 @@ class Clause:
         #2) UNIT
         #3) SAT
         #4) UNRESOLVED
+        #it maintains two watch pointers (pointers to literals)
+        # these watch pointers help limit the time required to determine
+        # the clause's status
         if len(self.literals)<1:
             #the empty clause is always unsat
             return "UNSAT"

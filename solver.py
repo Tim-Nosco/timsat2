@@ -104,7 +104,11 @@ class Solver:
                 logging.info("Adding clause: {}".format(new_clause))
                 new_clause.link()
                 self.clauses.append(new_clause)
-                return sorted([x.variable.stk_ptr.dl for x in new_clause],reverse=True)[1]
+                #return the second highest decision level
+                r = [x.variable.stk_ptr.dl for x in new_clause]
+                i = r.index(max(r))
+                r = r[:i]+r[i+1:]
+                return max(r)
             literals = filter(lambda x: x.variable.stk_ptr and x.variable.stk_ptr.clause,new_clause)
             l = max(literals,key=lambda x: x.variable.stk_ptr.dl)
     def BackTrack(self):

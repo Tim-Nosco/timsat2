@@ -122,7 +122,7 @@ class Solver:
         self.stack.push(a)
         x.assign(a)
     def CDCL(self):
-        if self.pre_condition_CONFLICT or self.UnitPropagation():
+        if self.pre_condition_CONFLICT:
             return "UNSAT"
         self.dl = 0
         while not self.AllVariablesAssigned():

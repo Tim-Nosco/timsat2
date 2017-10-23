@@ -82,7 +82,7 @@ class Solver:
         logging.debug(" -> %s",new_clause)
         l = new_clause.max_lit
         while True:
-            logging.debug("Resolving: %s with %s",assignment.clause,conflict_clause)
+            logging.debug("Resolving: %s with %s",new_clause,l.variable.stk_ptr.clause)
             new_clause = new_clause.resolve(l.variable.stk_ptr.clause)
             logging.debug(" -> %s",new_clause)
             if len(new_clause)==0:
@@ -110,7 +110,7 @@ class Solver:
         #clean up every assignment >= self.dl
         # remove from stack and unassign
         logging.info("Returning to decision level: %s",self.dl)
-        while len(self.stack) and self.stack[-1].dl >= self.dl:
+        while len(self.stack) and self.stack[-1].dl >= self.dl +1:
             a = self.stack.pop()
             logging.debug("Unassigning: %s",a.var)
             a.var.unassign()
@@ -135,9 +135,8 @@ class Solver:
                 if b<0:
                     return "UNSAT"
                 else:
-                    self.dl = b
+                    self.dl = b-1
                     self.BackTrack()
-                    self.dl -=1
                 if b==0:
                     logging.info("RESTART")
                     self.setup()

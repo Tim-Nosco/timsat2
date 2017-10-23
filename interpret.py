@@ -45,7 +45,7 @@ if __name__=="__main__":
     if len(sys.argv)<2:
         exit(1)
     #logging.basicConfig(filename=sys.argv[1]+".log",level=logging.DEBUG)
-    # logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
     p = Parser(sys.argv[1])
     s = Solver(p)
     print "Solving..."

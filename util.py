@@ -175,14 +175,13 @@ class Clause:
         # and resolves them into a single clause
         #resolution only works on two clauses
         assert(isinstance(clause2,Clause))
-        l = self.s.union(clause2.s)
-        f = filter(lambda x: -x in l, l)
+        all_literals = self.s.union(clause2.s)
+        shared_var = filter(lambda x: -x in all_literals, all_literals)
         #a single literal must differ (no more or less)
-        assert(len(f)==2)#+/- x
-        for x in f:
-            l.remove(x)
-        r = Clause(*l)
-        return r
+        assert(len(shared_var)==2)#+/- x
+        for x in shared_var:
+            all_literals.remove(x)
+        return Clause(*all_literals)
 
 class OccurrenceList(list):
     def unlink(self,idx):

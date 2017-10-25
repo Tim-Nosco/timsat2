@@ -3,8 +3,7 @@ import logging
 
 class Solver:
     def __init__(self,parser):
-        self.vars = [parser.known[x] for x in parser.known]
-        self.vars.sort(key=lambda x: x.count)
+        self.vars = parser.known.values()
         self.clauses = parser.clauses
         self.setup()
     def setup(self):
@@ -34,10 +33,13 @@ class Solver:
     def Model(self):
         return dict((v.name,v.value()) for v in self.vars)
     def PickBranchingVariable(self):
+        m = Variable('tmp')
         for v in self.vars:
-            if not v.isAssigned():
-                logging.info("Branching dl: %s -> %s = %s",self.dl+1,v.name,False)
-                return v,False
+            if not v.isAssigned() and v.count>=m.count:
+                m = v
+        pol = False
+        logging.info("Branching dl: %s -> %s = %s",self.dl+1,v.name,pol)
+        return m,pol
     def AllVariablesAssigned(self):
         return all(x.isAssigned() for x in self.vars)
     def UnitPropagation(self):
@@ -91,7 +93,7 @@ class Solver:
             elif len(new_clause)==1:
                 #single literal clause
                 logging.debug("Resolved a single literal clause: %s",new_clause)
-                self.clauses.append(new_clause)
+                self.addclause(new_clause)
                 solo = new_clause.literals[0]
                 logging.info("Learned: %s -> %s = %s",new_clause,solo.variable,solo.polarity)
                 return 0
@@ -102,10 +104,14 @@ class Solver:
                 logging.debug("UIP Because: %s",refA)
                 logging.info("Adding clause: %s",new_clause)
                 new_clause.link()
-                self.clauses.append(new_clause)
+                self.addclause(new_clause)
                 #return the second highest decision level
                 return refB.variable.stk_ptr.dl
             l = new_clause.max_lit
+    def addclause(self,c):
+        self.clauses.append(c)
+        for l in c:
+            l.variable.count+=1
     def BackTrack(self):
         #clean up every assignment >= self.dl
         # remove from stack and unassign
@@ -137,7 +143,7 @@ class Solver:
                 else:
                     self.dl = b-1
                     self.BackTrack()
-                if b==0:
+                if True:#b==0:
                     logging.info("RESTART")
                     self.setup()
                     return self.CDCL()
